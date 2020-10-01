@@ -46,7 +46,7 @@ with open('citeseer/citeseer.edges','r') as f:
 
 no_labels = len(np.unique(node_label))
 
-###### random grouping 
+###### Step.1 initialize with randomly grouped nodes 
 n_cluster = 200
 node_idx = np.array(range(len(node_label)))
 np.random.shuffle(node_idx)
@@ -61,12 +61,11 @@ for i in range(n_cluster):
 	group_idx_range.append(np.array(node_idx)[start_idx:end_idx])
 
 
-
 ######## clean baseline 
-clf_proj = TruncatedSVD(n_components = 30,n_iter = 15,random_state=42)
-graph_proj = clf_proj.fit_transform(citeseer_graph)
+#clf_proj = TruncatedSVD(n_components = 30,n_iter = 15,random_state=42)
+#graph_proj = clf_proj.fit_transform(citeseer_graph)
 
-######## local node degree
+######## Step.2 local node degree calculated using the randomly grouped nodes
 local_node_degree = []
 for k in range(len(node_label)):
 	degree_no = local_degree_gen(citeseer_graph,k,group_idx_range)
@@ -75,6 +74,7 @@ for k in range(len(node_label)):
 
 local_node_degree = np.array(local_node_degree)
 
+##### Step.3 regroup the nodes with the local node degree vectors and specified node group numbers 
 n_cluster = 500
 clustering_ml = KMeans(n_clusters=n_cluster).fit(local_node_degree)
 cluster_idx = clustering_ml.labels_
@@ -83,7 +83,7 @@ group_idx_range = []
 for k in range(n_cluster):
 	group_idx_range.append(np.where(cluster_idx == k)[0])
 
-######## local node degree
+######## Step.4 calcualte local node degree
 local_node_degree = []
 for k in range(len(node_label)):
 	degree_no = local_degree_gen(citeseer_graph,k,group_idx_range)
