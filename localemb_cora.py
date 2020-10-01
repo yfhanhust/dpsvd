@@ -9,7 +9,7 @@ def random_flipping(graph_adj,epsilon):
 	for i in range(graph_adj.shape[0]):
 		for j in range(i+1,graph_adj.shape[1]):
 			random_sample = np.random.uniform(0.0,1.0,1)
-			if random_sample <= (1-1 / (1 + np.exp(epsilon))):
+			if random_sample <= 1 / (1 + np.exp(epsilon)):
 				graph_adj[i,j] = 1 - graph_adj[i,j]
 				graph_adj[j,i] = graph_adj[i,j]
 
@@ -42,7 +42,7 @@ no_labels = len(np.unique(node_label))
 clf_proj = TruncatedSVD(n_components = 3*no_labels,n_iter = 15,random_state=42)
 graph_proj = clf_proj.fit_transform(citeseer_graph)
 
-###### random grouping 
+###### Step.1 random grouping 
 n_cluster = 35
 node_idx = np.array(range(len(node_label)))
 np.random.shuffle(node_idx)
@@ -59,10 +59,10 @@ for i in range(n_cluster):
 
 
 ######## clean baseline 
-clf_proj = TruncatedSVD(n_components = 30,n_iter = 15,random_state=42)
-graph_proj = clf_proj.fit_transform(citeseer_graph)
+#clf_proj = TruncatedSVD(n_components = 30,n_iter = 15,random_state=42)
+#graph_proj = clf_proj.fit_transform(citeseer_graph)
 
-######## local node degree
+######## Step.2 calculate local node degree vectors with the randomly initliazed node groups
 local_node_degree = []
 for k in range(len(node_label)):
 	degree_no = local_degree_gen(citeseer_graph,k,group_idx_range)
@@ -71,6 +71,8 @@ for k in range(len(node_label)):
 
 local_node_degree = np.array(local_node_degree)
 
+
+####### Step.3 Refine the node clusters with the local node degree vectors derived from Step.2 
 n_cluster = 10
 clustering_ml = KMeans(n_clusters=n_cluster).fit(local_node_degree)
 cluster_idx = clustering_ml.labels_
@@ -79,7 +81,7 @@ group_idx_range = []
 for k in range(n_cluster):
 	group_idx_range.append(np.where(cluster_idx == k)[0])
 
-######## local node degree
+######## Step.4 Calculate local node degree vectors with the updated node groups 
 local_node_degree = []
 for k in range(len(node_label)):
 	degree_no = local_degree_gen(citeseer_graph,k,group_idx_range)
