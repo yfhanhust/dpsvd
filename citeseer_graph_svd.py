@@ -198,10 +198,3 @@ print(normalized_mutual_info_score(node_label,cluster_model.labels_))
 
 
 
-#### funding use: 
-#### 1. Do I have the flexibility of choosing PHD candidate  ?  Is there any requirement, e.g. we need to hire local candiates first ? 
-#### 2. The goal of the research project with Total: how do we evaluate the research output in this project? do I have flexibility of conducting scientific exploration within the framework ?
-#### do we have audit reviewing research progress in this project ?
-#### 3. Does the funding cover travel expense of myself and the phd students, as well as the expense of purchasing computers / computing harwares? 
-#### 4. Do I have the flexibility of hiring temporally interns for a short period, e.g. several months / inviting people to visit my research group / organizing seminars?
-#### 5. very last question, it is about salary package, how much would be the salary scale and the housing allowance ?  
