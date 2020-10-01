@@ -71,7 +71,7 @@ epsilon = [1,10]
 ##### baseline 1: svd on original adjacency matrix 
 clf_proj = TruncatedSVD(n_components = 30,n_iter = 15,random_state=42)
 graph_proj = clf_proj.fit_transform(citeseer_graph)
-##### baseline 2: randomly flipping noise according to e^epsilon / (1 + e^epsilon)
+##### baseline 2: randomly flipping noise according to 1 / (1 + e^epsilon)
 citeseer_graph_copy = np.copy(citeseer_graph)
 citeseer_graph_copy = random_flipping(citeseer_graph_copy,1.0)
 graph_proj_1 = clf_proj.fit_transform(citeseer_graph_copy)
@@ -85,18 +85,13 @@ print(epsilon1)
 gaussian_graph_noise = np.random.normal(0,noise_std,citeseer_graph_copy2.shape)
 citeseer_graph_copy2 += gaussian_graph_noise 
 graph_proj_2 = clf_proj.fit_transform(citeseer_graph_copy2)
-
-
-
-
 ##### baseline 4: gradient descent + gradient perturbation 
-
 
 ##### the proposed method: random projection + add Gaussian noise to the graph adjacency matrix directly 
 #d = 10
 d = 30
 fraction = 8.
-'''
+
 rand_proj = GaussianRandomProjection(n_components = d) 
 graph_randn_proj = rand_proj.fit_transform(citeseer_graph)
 noise_std = fraction * np.sqrt(1/d)
@@ -104,8 +99,8 @@ graph_randn_proj += np.random.normal(0.0,noise_std,size=graph_randn_proj.shape)
 quad_base, r = qr(graph_randn_proj)
 #graph_randn_svd = quad_base[:,:3*no_labels]
 graph_randn_svd = graph_randn_proj
-'''
-graph_randn_svd = singlepass_evd(citeseer_graph,d)
+
+#graph_randn_svd = singlepass_evd(citeseer_graph,d)
 #alpha = 2.5
 #epsilon_renyi = np.max([2*(d/2*np.log((3+fraction)/(2+fraction)) + d/(2*(alpha-1))*np.log((3+fraction)/(alpha*(3+fraction) - (alpha-1)*(2+fraction)))),2*(d/2*np.log((2+fraction)/(3+fraction)) + d/(2*(alpha-1))*np.log((2+fraction)/(alpha*(2+fraction) - (alpha-1)*(3+fraction))))])
 #epsilon1 = epsilon_renyi + np.log(1/delta)/(alpha-1)
@@ -160,15 +155,15 @@ for iround in range(10):
 	test_idx.extend(class_4[int(0.9*len(class_4)):])
 	test_idx.extend(class_5[int(0.9*len(class_5)):])
 	test_idx.extend(class_6[int(0.9*len(class_6)):])
-	#clf.fit(graph_proj[train_idx,:],node_label[train_idx])
-	#acc_score.append(clf.score(graph_proj[test_idx,:],node_label[test_idx]))
-	#print(clf.score(graph_proj[test_idx,:],node_label[test_idx]))
-	#clf.fit(graph_proj_1[train_idx,:],node_label[train_idx])
-	#acc_score1.append(clf.score(graph_proj_1[test_idx,:],node_label[test_idx]))
-	#print(clf.score(graph_proj_1[test_idx,:],node_label[test_idx]))
-	#clf.fit(graph_proj_2[train_idx,:],node_label[train_idx])
-	#acc_score2.append(clf.score(graph_proj_2[test_idx,:],node_label[test_idx]))
-	#print(clf.score(graph_proj_2[test_idx,:],node_label[test_idx]))
+	clf.fit(graph_proj[train_idx,:],node_label[train_idx])
+	acc_score.append(clf.score(graph_proj[test_idx,:],node_label[test_idx]))
+	print(clf.score(graph_proj[test_idx,:],node_label[test_idx]))
+	clf.fit(graph_proj_1[train_idx,:],node_label[train_idx])
+	acc_score1.append(clf.score(graph_proj_1[test_idx,:],node_label[test_idx]))
+	print(clf.score(graph_proj_1[test_idx,:],node_label[test_idx]))
+	clf.fit(graph_proj_2[train_idx,:],node_label[train_idx])
+	acc_score2.append(clf.score(graph_proj_2[test_idx,:],node_label[test_idx]))
+	print(clf.score(graph_proj_2[test_idx,:],node_label[test_idx]))
 	clf.fit(graph_randn_svd[train_idx,:],node_label[train_idx])
 	acc_score_randn.append(clf.score(graph_randn_svd[test_idx,:],node_label[test_idx]))
 	#print(clf.score(graph_randn_proj,node_label))
