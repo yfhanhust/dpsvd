@@ -11,7 +11,7 @@ def random_flipping(graph_adj,epsilon):
 	for i in range(graph_adj.shape[0]):
 		for j in range(i+1,graph_adj.shape[1]):
 			random_sample = np.random.uniform(0.0,1.0,1)
-			if random_sample <= (1-1 / (1 + np.exp(epsilon))):
+			if random_sample <= 1 / (1 + np.exp(epsilon)):
 				graph_adj[i,j] = 1 - graph_adj[i,j]
 				graph_adj[j,i] = graph_adj[i,j]
 
